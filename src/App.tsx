@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   ChevronDown, 
@@ -7,8 +7,6 @@ import {
   Music, 
   MapPin, 
   Heart,
-  Volume2,
-  VolumeX,
   Sparkles
 } from "lucide-react";
 
@@ -25,7 +23,7 @@ import OrganizerPortal from "./components/OrganizerPortal";
 export default function App() {
   const [showWebsite, setShowWebsite] = useState(false);
   const [heroVideoFailed, setHeroVideoFailed] = useState(false);
-  const [introMuted, setIntroMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Floating Petals State
   const [petals, setPetals] = useState<{ id: number; left: number; delay: number; duration: number; size: number }[]>([]);
@@ -59,30 +57,33 @@ export default function App() {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black overflow-hidden"
           >
-            {/* Background Fullscreen Envelope Video */}
+            {/* Background Fullscreen Envelope Video with Sound, Unmuted, No Loop, Opens Website when finished */}
             <video
+              ref={videoRef}
               src={`${import.meta.env.BASE_URL}Envelope.mp4`}
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
-              muted={introMuted}
               playsInline
-              loop
+              // @ts-ignore
+              defaultMuted={false}
+              muted={false}
+              onLoadedMetadata={() => {
+                if (videoRef.current) {
+                  videoRef.current.muted = false;
+                  videoRef.current.volume = 1.0;
+                  videoRef.current.play().catch((err) => {
+                    console.log("Autoplay with sound was prevented by browser policy:", err);
+                  });
+                }
+              }}
+              onEnded={() => setShowWebsite(true)}
             />
 
-            {/* Subtle dark gradient overlay to make buttons and text pop */}
-            <div className="absolute inset-0 bg-black/40 pointer-events-none" />
-
-            {/* Sound Toggle Button (Top Right) */}
-            <button
-              onClick={() => setIntroMuted(!introMuted)}
-              className="absolute top-6 right-6 z-20 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full backdrop-blur-md transition-all border border-white/20"
-              title={introMuted ? "Unmute" : "Mute"}
-            >
-              {introMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-            </button>
+            {/* Subtle dark gradient overlay to make text pop */}
+            <div className="absolute inset-0 bg-black/30 pointer-events-none" />
 
             {/* Foreground Content Container */}
-            <div className="relative z-10 max-w-lg w-full px-6 text-center flex flex-col items-center justify-between h-full py-16">
+            <div className="relative z-10 max-w-lg w-full px-6 text-center flex flex-col items-center justify-between h-full py-16 pointer-events-none">
               
               {/* Top Title / Badge */}
               <div className="flex flex-col items-center">
@@ -116,21 +117,8 @@ export default function App() {
                 </motion.h2>
               </div>
 
-              {/* Bottom Enter Site Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.7 }}
-                className="w-full flex justify-center pb-6"
-              >
-                <button
-                  onClick={() => setShowWebsite(true)}
-                  className="group relative inline-flex items-center gap-3 px-10 py-4 bg-[#C6A96B]/90 hover:bg-[#C6A96B] text-white font-serif text-xs uppercase tracking-[0.3em] rounded-full shadow-2xl backdrop-blur-md border border-white/20 transition-all duration-300 transform hover:scale-105 active:scale-95"
-                >
-                  <span>Open Invitation</span>
-                  <Heart className="w-3.5 h-3.5 fill-white/20 transition-transform group-hover:scale-125" />
-                </button>
-              </motion.div>
+              {/* Empty bottom space since open button is removed */}
+              <div />
 
             </div>
           </motion.div>
