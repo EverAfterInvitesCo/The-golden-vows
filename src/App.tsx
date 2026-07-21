@@ -64,8 +64,6 @@ export default function App() {
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
               playsInline
-              // @ts-ignore
-              defaultMuted={false}
               muted={false}
               onLoadedMetadata={() => {
                 if (videoRef.current) {
@@ -77,13 +75,26 @@ export default function App() {
                 }
               }}
               onEnded={() => setShowWebsite(true)}
+              onError={(e) => {
+                console.log("Envelope video failed to load, bypassing intro:", e);
+                setShowWebsite(true);
+              }}
             />
 
             {/* Subtle dark gradient overlay to make text pop */}
             <div className="absolute inset-0 bg-black/30 pointer-events-none" />
 
-            {/* Foreground Content Container */}
-            <div className="relative z-10 max-w-lg w-full px-6 text-center flex flex-col items-center justify-between h-full py-16 pointer-events-none">
+            {/* Foreground Content Container with Click-to-Enter Fallback if Autoplay blocked */}
+            <div 
+              className="relative z-10 max-w-lg w-full px-6 text-center flex flex-col items-center justify-between h-full py-16 cursor-pointer"
+              onClick={() => {
+                if (videoRef.current) {
+                  videoRef.current.muted = false;
+                  videoRef.current.play();
+                }
+                setShowWebsite(true);
+              }}
+            >
               
               {/* Top Title / Badge */}
               <div className="flex flex-col items-center">
@@ -117,8 +128,12 @@ export default function App() {
                 </motion.h2>
               </div>
 
-              {/* Empty bottom space since open button is removed */}
-              <div />
+              {/* Click / Tap to Enter Hint if browser restricts video */}
+              <div className="pb-8">
+                <span className="font-serif text-xs tracking-[0.3em] text-[#C6A96B] uppercase animate-pulse border border-[#C6A96B]/40 py-2.5 px-6 rounded-full bg-black/40 backdrop-blur-sm">
+                  Tap Anywhere to Enter 🤍
+                </span>
+              </div>
 
             </div>
           </motion.div>
