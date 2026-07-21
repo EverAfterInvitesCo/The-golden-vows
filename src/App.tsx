@@ -50,87 +50,87 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#FAF8F4] text-[#2D2D2D] relative overflow-x-hidden selection:bg-[#C6A96B]/25 selection:text-[#2D2D2D]">
       
-      {/* 1. INTRO EXPERIENCE / ENVELOPE GATE */}
+      {/* 1. INTRO EXPERIENCE / FULLSCREEN ENVELOPE VIDEO */}
       <AnimatePresence>
         {!showWebsite && (
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#FAF8F4] overflow-hidden"
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black overflow-hidden"
           >
-            {/* Background Ambience */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#C6A96B]/5 via-transparent to-[#C6A96B]/10 pointer-events-none" />
+            {/* Background Fullscreen Envelope Video */}
+            <video
+              src={`${import.meta.env.BASE_URL}Envelope.mp4`}
+              className="absolute inset-0 w-full h-full object-cover"
+              autoPlay
+              muted={introMuted}
+              playsInline
+              loop
+            />
 
-            <div className="relative z-10 max-w-md w-full px-6 text-center flex flex-col items-center">
+            {/* Subtle dark gradient overlay to make buttons and text pop */}
+            <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+
+            {/* Sound Toggle Button (Top Right) */}
+            <button
+              onClick={() => setIntroMuted(!introMuted)}
+              className="absolute top-6 right-6 z-20 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full backdrop-blur-md transition-all border border-white/20"
+              title={introMuted ? "Unmute" : "Mute"}
+            >
+              {introMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            </button>
+
+            {/* Foreground Content Container */}
+            <div className="relative z-10 max-w-lg w-full px-6 text-center flex flex-col items-center justify-between h-full py-16">
               
-              {/* Monogram / Top Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                className="w-14 h-14 border border-[#C6A96B]/40 rounded-full flex items-center justify-center mb-6"
-              >
-                <span className="font-serif text-sm text-[#C6A96B] tracking-widest">
-                  TY
-                </span>
-              </motion.div>
-
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="font-serif text-[10px] tracking-[0.35em] text-[#C6A96B] uppercase block mb-2"
-              >
-                You Are Invited
-              </motion.span>
-
-              <motion.h2
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="font-script text-4xl md:text-5xl text-[#2D2D2D] mb-6 italic"
-              >
-                Tasneem & Yehia
-              </motion.h2>
-
-              {/* Envelope Video Animation Container */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 1, delay: 0.5 }}
-                className="relative w-full aspect-square max-w-[320px] rounded-2xl overflow-hidden border border-[#C6A96B]/20 shadow-xl bg-white mb-8"
-              >
-                <video
-                  src={`${import.meta.env.BASE_URL}Envelope.mp4`}
-                  className="w-full h-full object-cover"
-                  autoPlay
-                  muted={introMuted}
-                  playsInline
-                  loop
-                />
-
-                {/* Sound Toggle Button Over Video */}
-                <button
-                  onClick={() => setIntroMuted(!introMuted)}
-                  className="absolute bottom-4 right-4 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full backdrop-blur-sm transition-all"
-                  title={introMuted ? "Unmute" : "Mute"}
+              {/* Top Title / Badge */}
+              <div className="flex flex-col items-center">
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="w-14 h-14 border border-white/40 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm"
                 >
-                  {introMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                </button>
-              </motion.div>
+                  <span className="font-serif text-sm text-white tracking-widest">
+                    TY
+                  </span>
+                </motion.div>
 
-              {/* Enter Site Button */}
-              <motion.button
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  className="font-serif text-[10px] tracking-[0.35em] text-[#C6A96B] uppercase block mb-1 drop-shadow"
+                >
+                  You Are Invited
+                </motion.span>
+
+                <motion.h2
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                  className="font-script text-4xl md:text-6xl text-white drop-shadow-md italic"
+                >
+                  Tasneem & Yehia
+                </motion.h2>
+              </div>
+
+              {/* Bottom Enter Site Button */}
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.7 }}
-                onClick={() => setShowWebsite(true)}
-                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#C6A96B] text-white font-serif text-xs uppercase tracking-[0.3em] rounded-full shadow-lg hover:bg-[#b5985b] transition-all duration-300 transform hover:scale-105 active:scale-95"
+                className="w-full flex justify-center pb-6"
               >
-                <span>Open Invitation</span>
-                <Heart className="w-3.5 h-3.5 fill-white/20 transition-transform group-hover:scale-125" />
-              </motion.button>
+                <button
+                  onClick={() => setShowWebsite(true)}
+                  className="group relative inline-flex items-center gap-3 px-10 py-4 bg-[#C6A96B]/90 hover:bg-[#C6A96B] text-white font-serif text-xs uppercase tracking-[0.3em] rounded-full shadow-2xl backdrop-blur-md border border-white/20 transition-all duration-300 transform hover:scale-105 active:scale-95"
+                >
+                  <span>Open Invitation</span>
+                  <Heart className="w-3.5 h-3.5 fill-white/20 transition-transform group-hover:scale-125" />
+                </button>
+              </motion.div>
 
             </div>
           </motion.div>
