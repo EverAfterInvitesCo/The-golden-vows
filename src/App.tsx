@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 
 // Components
-import IntroExperience from "./components/IntroExperience";
 import SectionDivider from "./components/SectionDivider";
 import CountdownCalendar from "./components/CountdownCalendar";
 import StorySection from "./components/StorySection";
@@ -26,7 +25,7 @@ import OrganizerPortal from "./components/OrganizerPortal";
 export default function App() {
   const [showWebsite, setShowWebsite] = useState(false);
   const [heroVideoFailed, setHeroVideoFailed] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [introMuted, setIntroMuted] = useState(true);
 
   // Floating Petals State
   const [petals, setPetals] = useState<{ id: number; left: number; delay: number; duration: number; size: number }[]>([]);
@@ -51,10 +50,90 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#FAF8F4] text-[#2D2D2D] relative overflow-x-hidden selection:bg-[#C6A96B]/25 selection:text-[#2D2D2D]">
       
-      {/* 1. INTRO EXPERIENCE */}
+      {/* 1. INTRO EXPERIENCE / ENVELOPE GATE */}
       <AnimatePresence>
         {!showWebsite && (
-          <IntroExperience onComplete={() => setShowWebsite(true)} />
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#FAF8F4] overflow-hidden"
+          >
+            {/* Background Ambience */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#C6A96B]/5 via-transparent to-[#C6A96B]/10 pointer-events-none" />
+
+            <div className="relative z-10 max-w-md w-full px-6 text-center flex flex-col items-center">
+              
+              {/* Monogram / Top Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="w-14 h-14 border border-[#C6A96B]/40 rounded-full flex items-center justify-center mb-6"
+              >
+                <span className="font-serif text-sm text-[#C6A96B] tracking-widest">
+                  TY
+                </span>
+              </motion.div>
+
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="font-serif text-[10px] tracking-[0.35em] text-[#C6A96B] uppercase block mb-2"
+              >
+                You Are Invited
+              </motion.span>
+
+              <motion.h2
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="font-script text-4xl md:text-5xl text-[#2D2D2D] mb-6 italic"
+              >
+                Tasneem & Yehia
+              </motion.h2>
+
+              {/* Envelope Video Animation Container */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="relative w-full aspect-square max-w-[320px] rounded-2xl overflow-hidden border border-[#C6A96B]/20 shadow-xl bg-white mb-8"
+              >
+                <video
+                  src={`${import.meta.env.BASE_URL}Envelope.mp4`}
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  muted={introMuted}
+                  playsInline
+                  loop
+                />
+
+                {/* Sound Toggle Button Over Video */}
+                <button
+                  onClick={() => setIntroMuted(!introMuted)}
+                  className="absolute bottom-4 right-4 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full backdrop-blur-sm transition-all"
+                  title={introMuted ? "Unmute" : "Mute"}
+                >
+                  {introMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                </button>
+              </motion.div>
+
+              {/* Enter Site Button */}
+              <motion.button
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.7 }}
+                onClick={() => setShowWebsite(true)}
+                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#C6A96B] text-white font-serif text-xs uppercase tracking-[0.3em] rounded-full shadow-lg hover:bg-[#b5985b] transition-all duration-300 transform hover:scale-105 active:scale-95"
+              >
+                <span>Open Invitation</span>
+                <Heart className="w-3.5 h-3.5 fill-white/20 transition-transform group-hover:scale-125" />
+              </motion.button>
+
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -66,11 +145,6 @@ export default function App() {
           transition={{ duration: 0.3, ease: "linear" }}
           className="relative w-full"
         >
-          {/* Subtle Ambient Background Music or Audio controls (Optional high-end feature) */}
-          <div className="fixed top-6 right-6 z-40 flex items-center gap-2">
-            {/* Elegant sound indicator/music can go here */}
-          </div>
-
           {/* Floating Rose Petals / Flower Accents for luxury romance vibe */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden z-25">
             {petals.map((petal) => (
@@ -200,27 +274,17 @@ export default function App() {
 
           {/* ================= SECTION 2: THE INVITATION ================= */}
           <section className="relative px-6 py-24 md:py-32 bg-[#FAF8F4] z-10 overflow-hidden">
-            {/* Elegant Background Accents */}
             <div className="absolute top-0 left-0 w-72 h-72 bg-gradient-to-br from-[#C6A96B]/5 to-transparent rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 right-0 w-72 h-72 bg-gradient-to-tl from-[#C6A96B]/5 to-transparent rounded-full blur-3xl pointer-events-none" />
             
-            {/* Vintage Ornamental Corner Borders */}
-            <div className="absolute top-12 left-12 w-10 h-10 border-t border-l border-[#C6A96B]/20 hidden md:block" />
-            <div className="absolute top-12 right-12 w-10 h-10 border-t border-r border-[#C6A96B]/20 hidden md:block" />
-            <div className="absolute bottom-12 left-12 w-10 h-10 border-b border-l border-[#C6A96B]/20 hidden md:block" />
-            <div className="absolute bottom-12 right-12 w-10 h-10 border-b border-r border-[#C6A96B]/20 hidden md:block" />
-
             <div className="max-w-6xl mx-auto">
-              {/* Main Premium Invitation Card */}
               <div className="relative bg-[#FAF8F4]/40 backdrop-blur-md rounded-3xl p-8 md:p-16 border border-[#C6A96B]/15 shadow-[0_20px_50px_rgba(198,169,107,0.04)]">
                 
-                {/* Thin internal gold double border frame */}
                 <div className="absolute inset-3 border border-[#C6A96B]/10 rounded-[22px] pointer-events-none" />
                 <div className="absolute inset-4 border border-[#C6A96B]/5 rounded-[21px] pointer-events-none" />
                 
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12 lg:gap-20">
                   
-                  {/* Left Column: Staggered text invitation message */}
                   <motion.div
                     className="w-full md:w-1/2 text-center md:text-left space-y-6"
                     initial={{ opacity: 0, x: -40 }}
@@ -257,7 +321,6 @@ export default function App() {
                     </div>
                   </motion.div>
 
-                  {/* Right Column: Kids Illustration / Childhood Picture with elegant frame */}
                   <motion.div
                     className="w-full md:w-1/2 flex justify-center md:justify-end"
                     initial={{ opacity: 0, x: 40 }}
@@ -266,17 +329,13 @@ export default function App() {
                     transition={{ duration: 1.2, ease: "easeOut" }}
                   >
                     <div className="relative w-full max-w-[420px] group">
-                      
-                      {/* Decorative Gold Rings Background Behind Image */}
                       <div className="absolute -inset-4 border border-[#C6A96B]/20 rounded-2xl rotate-2 group-hover:rotate-0 transition-transform duration-700 pointer-events-none" />
                       <div className="absolute -inset-4 border border-[#C6A96B]/10 rounded-2xl -rotate-2 group-hover:rotate-0 transition-transform duration-700 pointer-events-none" />
                       
-                      {/* Glassmorphism Frame wrapper */}
                       <div className="relative overflow-hidden rounded-2xl bg-white/40 p-4 border border-[#C6A96B]/15 shadow-xl">
                         <img
                           src={`${import.meta.env.BASE_URL}kids.png`}
                           onError={(e) => {
-                            console.log("kids.png not found, loading childhood/vintage style fallback.");
                             e.currentTarget.src = "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1200";
                           }}
                           alt="Tasneem and Yehia Childhood"
@@ -285,7 +344,6 @@ export default function App() {
                         />
                       </div>
                       
-                      {/* Subtle elegant gold emblem overlay */}
                       <div className="absolute -bottom-3 -right-3 w-10 h-10 bg-[#FAF8F4] border border-[#C6A96B]/30 rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-500">
                         <Heart className="w-4 h-4 text-[#C6A96B] fill-[#C6A96B]/10 stroke-[1.5]" />
                       </div>
@@ -302,8 +360,6 @@ export default function App() {
           {/* ================= SECTION 3: QURANIC VERSE ================= */}
           <section className="relative px-6 py-16 md:py-24 bg-[#FAF8F4] z-10">
             <div className="max-w-3xl mx-auto text-center space-y-8">
-              
-              {/* Amiri Arabic script font verse */}
               <motion.div
                 initial={{ opacity: 0, y: 35 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -316,14 +372,12 @@ export default function App() {
                 </p>
               </motion.div>
 
-              {/* Gold heart line ornament */}
               <div className="flex items-center justify-center gap-3 py-1">
                 <div className="h-[1px] w-8 bg-[#C6A96B]/20" />
                 <Heart className="w-4 h-4 text-[#C6A96B]/60 stroke-[1]" />
                 <div className="h-[1px] w-8 bg-[#C6A96B]/20" />
               </div>
 
-              {/* English Surah Ar-Rum Translation */}
               <motion.div
                 initial={{ opacity: 0, y: 25 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -338,50 +392,28 @@ export default function App() {
                   Surah Ar-Rum — 30:21
                 </span>
               </motion.div>
-
             </div>
           </section>
 
           <SectionDivider />
-
-          {/* ================= SECTION 4: COUNTDOWN & CALENDAR ================= */}
           <CountdownCalendar />
-
           <SectionDivider />
-
-          {/* ================= SECTION 5: OUR STORY ================= */}
           <StorySection />
-
           <SectionDivider />
-
-          {/* ================= SECTION 6: WEDDING TIMELINE ================= */}
           <WeddingTimeline />
-
           <SectionDivider />
-
-          {/* ================= SECTION 7: VENUE ================= */}
           <WeddingVenue />
-
           <SectionDivider />
-
-          {/* ================= SECTION 8: RSVP FORM ================= */}
           <RSVPSection />
-
           <SectionDivider />
-
-          {/* ================= SECTION 9: PHOTO UPLOAD & WALL ================= */}
           <PhotoUploadSection />
-
           <SectionDivider />
-
-          {/* ================= SECTION 10: ORGANIZER PORTAL ================= */}
           <OrganizerPortal />
 
           {/* ================= FOOTER ================= */}
           <footer className="relative bg-[#FAF8F4] border-t border-[#C6A96B]/15 pt-16 pb-12 px-6 z-10">
             <div className="max-w-4xl mx-auto flex flex-col items-center text-center space-y-6">
               
-              {/* Intertwined Wedding Rings Logo */}
               <motion.div
                 className="relative w-20 h-14 flex items-center justify-center"
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -389,19 +421,15 @@ export default function App() {
                 viewport={{ once: true }}
                 transition={{ duration: 1 }}
               >
-                {/* Left Ring */}
                 <div className="absolute w-10 h-10 border-2 border-[#C6A96B] rounded-full left-3 top-2 flex items-center justify-center shadow-sm">
                   <span className="font-serif text-[9px] text-[#C6A96B] font-bold">T</span>
                 </div>
-                {/* Right Ring */}
                 <div className="absolute w-10 h-10 border-2 border-[#C6A96B] rounded-full right-3 bottom-2 flex items-center justify-center shadow-sm">
                   <span className="font-serif text-[9px] text-[#C6A96B] font-bold">Y</span>
                 </div>
-                {/* Sparkle badge */}
                 <Sparkles className="absolute top-1 right-2 w-3 h-3 text-[#C6A96B] animate-pulse" />
               </motion.div>
 
-              {/* Title & Brand */}
               <div className="space-y-1">
                 <span className="font-serif text-[10px] tracking-[0.3em] text-[#C6A96B] uppercase block">
                   EverAfter Invites
@@ -411,7 +439,6 @@ export default function App() {
                 </p>
               </div>
 
-              {/* Social Icons Links with gold hover effects */}
               <div className="flex gap-6 py-4">
                 <a
                   href="https://www.instagram.com/_everafterinvites_/?hl=en"
@@ -442,7 +469,6 @@ export default function App() {
                 </a>
               </div>
 
-              {/* Copyright */}
               <div className="pt-6 border-t border-[#C6A96B]/10 w-full text-center">
                 <span className="font-sans text-[10px] text-[#2D2D2D]/40 uppercase tracking-widest">
                   © 2026 EVERAFTERINVITES. ALL RIGHTS RESERVED.
