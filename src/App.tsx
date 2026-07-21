@@ -103,7 +103,7 @@ export default function App() {
             {/* Background Cinematic Video Loop */}
             {!heroVideoFailed ? (
               <video
-                src="/assets/Window.mp4"
+                src={`${import.meta.env.BASE_URL}Window.mp4`}
                 className="absolute inset-0 w-full h-full object-cover"
                 autoPlay
                 muted
@@ -274,7 +274,7 @@ export default function App() {
                       {/* Glassmorphism Frame wrapper */}
                       <div className="relative overflow-hidden rounded-2xl bg-white/40 p-4 border border-[#C6A96B]/15 shadow-xl">
                         <img
-                          src="/assets/kids.png"
+                          src={`${import.meta.env.BASE_URL}kids.png`}
                           onError={(e) => {
                             console.log("kids.png not found, loading childhood/vintage style fallback.");
                             e.currentTarget.src = "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1200";
@@ -312,7 +312,7 @@ export default function App() {
                 className="px-4"
               >
                 <p className="font-arabic text-3xl md:text-4xl text-[#2D2D2D] leading-[1.8] text-center antialiased">
-                  وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً ۚ إِنَّ فِي ذَٰلِكَ لَآيَاتٍ لِّقَوْمٍ يَتَفَكَّرُونَ
+                  وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً ۚ إِنَّ فِي ذَٰلِكَ لَآيَاتٍ لِّقَوْمٍ يَتَفَكَّرُونَ
                 </p>
               </motion.div>
 
