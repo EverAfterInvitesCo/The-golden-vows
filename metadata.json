@@ -1,0 +1,6 @@
+{
+  "name": "Wedding Invitation Website",
+  "description": "A premium luxury digital wedding invitation and cinematic interactive website for Tasneem & Yehia, with RSVP tracking, image uploads, and an organizer dashboard.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
