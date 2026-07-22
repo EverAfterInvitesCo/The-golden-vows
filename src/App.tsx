@@ -75,9 +75,10 @@ export default function App() {
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
               playsInline
+              preload="auto"
               muted={false}
-              onLoadedMetadata={() => {
-                if (envelopeVideoRef.current) {
+              onCanPlayThrough={() => {
+                if (envelopeVideoRef.current && envelopeVideoRef.current.paused) {
                   envelopeVideoRef.current.muted = false;
                   envelopeVideoRef.current.volume = 1.0;
                   envelopeVideoRef.current.play().catch((err) => {
@@ -93,7 +94,7 @@ export default function App() {
             />
 
             {/* Subtle dark gradient overlay to make text pop */}
-            <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+            <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
             {/* Foreground Content Container with Click-to-Enter Fallback if Autoplay blocked */}
             <div 
@@ -108,7 +109,7 @@ export default function App() {
             >
               
               {/* Top Title / Badge */}
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center pt-8">
                 <motion.div
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -141,8 +142,8 @@ export default function App() {
 
               {/* Click / Tap to Enter Hint if browser restricts video */}
               <div className="pb-8">
-                <span className="font-serif text-xs tracking-[0.3em] text-[#C6A96B] uppercase animate-pulse border border-[#C6A96B]/40 py-2.5 px-6 rounded-full bg-black/40 backdrop-blur-sm">
-                  Tap Anywhere to Enter 🤍
+                <span className="font-serif text-xs tracking-[0.3em] text-[#C6A96B] uppercase animate-pulse border border-[#C6A96B]/40 py-2.5 px-6 rounded-full bg-black/50 backdrop-blur-sm">
+                  Tap Anywhere to Skip Intro 🤍
                 </span>
               </div>
 
@@ -211,6 +212,7 @@ export default function App() {
                 muted={isMuted}
                 loop
                 playsInline
+                preload="auto"
                 onLoadedMetadata={() => {
                   if (mainVideoRef.current) {
                     mainVideoRef.current.currentTime = 0;
