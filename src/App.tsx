@@ -68,7 +68,7 @@ export default function App() {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black overflow-hidden"
           >
-            {/* Background Fullscreen Trimmed Envelope Video with Sound */}
+            {/* Background Fullscreen Envelope Video playing fully until it ends */}
             <video
               ref={envelopeVideoRef}
               src={`${import.meta.env.BASE_URL}Envelope.mp4`}
@@ -189,7 +189,7 @@ export default function App() {
           {/* Sound Toggle Floating Button */}
           <button
             onClick={toggleSound}
-            className="fixed top-6 right-6 z-40 bg-black/50 hover:bg-black/70 text-white backdrop-blur-md border border-white/20 p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center group"
+            className="fixed top-6 right-6 z-40 bg-black/55 hover:bg-black/75 text-white backdrop-blur-md border border-white/20 p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center group"
             title={isMuted ? "Unmute Music/Audio" : "Mute Music/Audio"}
           >
             {isMuted ? (
@@ -216,7 +216,6 @@ export default function App() {
                     mainVideoRef.current.currentTime = 0;
                     mainVideoRef.current.muted = isMuted;
                     mainVideoRef.current.play().catch(() => {
-                      // fallback if browser blocks auto audio on hero transition
                       setIsMuted(true);
                       mainVideoRef.current!.muted = true;
                     });
@@ -225,7 +224,6 @@ export default function App() {
                 onError={handleHeroVideoError}
               />
             ) : (
-              /* Fallback Luxury Scenery Video Link (Mixkit stable CDN) */
               <video
                 src="https://assets.mixkit.co/videos/preview/mixkit-wedding-rings-and-flowers-40243-large.mp4"
                 className="absolute inset-0 w-full h-full object-cover"
