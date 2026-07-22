@@ -158,10 +158,16 @@ export default function App() {
                   if (mainVideoRef.current) {
                     mainVideoRef.current.currentTime = 0;
                     mainVideoRef.current.muted = isMuted;
-                    mainVideoRef.current.play().catch(() => {
-                      setIsMuted(true);
-                      mainVideoRef.current!.muted = true;
-                    });
+                    const playPromise = mainVideoRef.current.play();
+                    if (playPromise !== undefined) {
+                      playPromise.catch(() => {
+                        setIsMuted(true);
+                        if (mainVideoRef.current) {
+                          mainVideoRef.current.muted = true;
+                          mainVideoRef.current.play().catch(() => {});
+                        }
+                      });
+                    }
                   }
                 }}
                 onError={handleHeroVideoError}
