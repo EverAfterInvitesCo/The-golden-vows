@@ -42,17 +42,26 @@ export default function OrganizerPortal({ tick = 0 }: OrganizerPortalProps) {
     e.preventDefault();
     setAuthError(false);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) {
+    if (authError || !authData.user) {
       setAuthError(true);
-    } else {
-      setIsUnlocked(true);
-      loadSubmissions();
+      return;
     }
+
+    // Optional security check for multi-tenant slug isolation if assigned via metadata
+    const userSlug = authData.user.user_metadata?.wedding_slug;
+    if (userSlug && userSlug !== WEDDING_SLUG) {
+      await supabase.auth.signOut();
+      setAuthError(true);
+      return;
+    }
+
+    setIsUnlocked(true);
+    loadSubmissions();
   };
 
   const accepts = submss.filter((s) => String(s.attending).toLowerCase() === 'true' || String(s.attending).toLowerCase() === 'yes');
