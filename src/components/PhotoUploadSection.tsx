@@ -25,7 +25,7 @@ interface PhotoItem {
   created_at: string;
 }
 
-export default function GuestPhotoGallery() {
+export default function PhotoUploadSection() {
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -58,7 +58,6 @@ export default function GuestPhotoGallery() {
         .order("created_at", { ascending: false });
 
       if (error) {
-        // Fallback if table name differs or doesn't exist yet
         console.warn("Could not fetch from guest_photos:", error.message);
       } else if (data) {
         setPhotos(data);
@@ -101,7 +100,7 @@ export default function GuestPhotoGallery() {
 
     try {
       const fileExt = selectedFile.name.split(".").pop();
-      const fileName = `${WEDDING_SLUG}-${Date.now()}-${Math.random().toString(36.substring(2, 9))}.${fileExt}`;
+      const fileName = `${WEDDING_SLUG}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
       const filePath = `${fileName}`;
 
       // 1. Upload image to Supabase Storage bucket
