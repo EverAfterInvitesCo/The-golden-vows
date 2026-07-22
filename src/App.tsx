@@ -33,19 +33,27 @@ export default function App() {
   const [petals, setPetals] = useState<{ id: number; left: number; delay: number; duration: number; size: number }[]>([]);
 
   useEffect(() => {
-    // Generate petals positions for floating background effect
     const newPetals = Array.from({ length: 15 }).map((_, i) => ({
       id: i,
-      left: Math.random() * 100, // percentage
-      delay: Math.random() * 8, // seconds
-      duration: 10 + Math.random() * 12, // seconds
-      size: 8 + Math.random() * 12, // pixels
+      left: Math.random() * 100,
+      delay: Math.random() * 8,
+      duration: 10 + Math.random() * 12,
+      size: 8 + Math.random() * 12,
     }));
     setPetals(newPetals);
   }, []);
 
+  // Ensure Envelope.mp4 forces play cleanly on mount without interruptions
+  useEffect(() => {
+    if (envelopeVideoRef.current) {
+      envelopeVideoRef.current.currentTime = 0;
+      envelopeVideoRef.current.play().catch((err) => {
+        console.log("Autoplay blocked, user interaction required:", err);
+      });
+    }
+  }, []);
+
   const handleHeroVideoError = () => {
-    console.log("Hero video Window.mp4 failed or is missing, loading custom beautiful slow-motion scenery loop.");
     setHeroVideoFailed(true);
   };
 
@@ -68,84 +76,48 @@ export default function App() {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black overflow-hidden"
           >
-            {/* Background Fullscreen Envelope Video */}
+            {/* Pure native video tag without conflicting handlers */}
             <video
               ref={envelopeVideoRef}
               src={`${import.meta.env.BASE_URL}Envelope.mp4`}
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
               playsInline
-              muted={false}
-              onLoadedData={() => {
-                if (envelopeVideoRef.current) {
-                  envelopeVideoRef.current.muted = false;
-                  envelopeVideoRef.current.volume = 1.0;
-                  envelopeVideoRef.current.play().catch((err) => {
-                    console.log("Autoplay with sound was prevented by browser policy:", err);
-                  });
-                }
-              }}
+              preload="auto"
               onEnded={() => setShowWebsite(true)}
               onError={(e) => {
-                console.log("Envelope video failed to load, bypassing intro:", e);
+                console.log("Envelope video error:", e);
                 setShowWebsite(true);
               }}
             />
 
-            {/* Subtle dark gradient overlay to make text pop */}
-            <div className="absolute inset-0 bg-black/10 pointer-events-none" />
-
-            {/* Foreground Content Container with Click-to-Enter / Skip */}
+            {/* Click-to-Enter / Skip overlay */}
             <div 
               className="relative z-10 max-w-lg w-full px-6 text-center flex flex-col items-center justify-between h-full py-16 cursor-pointer"
               onClick={() => {
                 if (envelopeVideoRef.current) {
-                  envelopeVideoRef.current.muted = false;
                   envelopeVideoRef.current.play();
                 }
                 setShowWebsite(true);
               }}
             >
-              
-              {/* Top Title / Badge */}
               <div className="flex flex-col items-center pt-8">
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="w-14 h-14 border border-white/40 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm"
-                >
-                  <span className="font-serif text-sm text-white tracking-widest">
-                    TY
-                  </span>
-                </motion.div>
-
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-                  className="font-serif text-[10px] tracking-[0.35em] text-[#C6A96B] uppercase block mb-1 drop-shadow"
-                >
+                <div className="w-14 h-14 border border-white/40 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm">
+                  <span className="font-serif text-sm text-white tracking-widest">TY</span>
+                </div>
+                <span className="font-serif text-[10px] tracking-[0.35em] text-[#C6A96B] uppercase block mb-1 drop-shadow">
                   You Are Invited
-                </motion.span>
-
-                <motion.h2
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
-                  className="font-script text-4xl md:text-6xl text-white drop-shadow-md italic"
-                >
+                </span>
+                <h2 className="font-script text-4xl md:text-6xl text-white drop-shadow-md italic">
                   Tasneem & Yehia
-                </motion.h2>
+                </h2>
               </div>
 
-              {/* Click / Tap to Skip Hint */}
               <div className="pb-8">
                 <span className="font-serif text-xs tracking-[0.3em] text-[#C6A96B] uppercase animate-pulse border border-[#C6A96B]/40 py-2.5 px-6 rounded-full bg-black/50 backdrop-blur-sm">
                   Tap Anywhere to Skip Intro 🤍
                 </span>
               </div>
-
             </div>
           </motion.div>
         )}
@@ -159,7 +131,7 @@ export default function App() {
           transition={{ duration: 0.3, ease: "linear" }}
           className="relative w-full"
         >
-          {/* Floating Rose Petals / Flower Accents for luxury romance vibe */}
+          {/* Floating Rose Petals */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden z-25">
             {petals.map((petal) => (
               <motion.div
@@ -199,9 +171,8 @@ export default function App() {
             )}
           </button>
 
-          {/* ================= HERO SECTION (WINDOW.MP4 HERO VIDEO WITH SOUND) ================= */}
+          {/* ================= HERO SECTION ================= */}
           <header className="relative w-full h-screen flex flex-col items-center justify-center text-center overflow-hidden z-10">
-            {/* Background Cinematic Video Loop with Sound */}
             {!heroVideoFailed ? (
               <video
                 ref={mainVideoRef}
@@ -211,6 +182,7 @@ export default function App() {
                 muted={isMuted}
                 loop
                 playsInline
+                preload="auto"
                 onLoadedData={() => {
                   if (mainVideoRef.current) {
                     mainVideoRef.current.currentTime = 0;
@@ -234,13 +206,9 @@ export default function App() {
               />
             )}
 
-            {/* Slightly dark premium overlay */}
             <div className="absolute inset-0 bg-black/35 backdrop-blur-[1px] pointer-events-none" />
 
-            {/* Content Card with elegant entry stagger */}
             <div className="relative z-10 px-6 max-w-3xl flex flex-col items-center">
-              
-              {/* Monogram crest */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -262,7 +230,6 @@ export default function App() {
                 EverAfter Invites
               </motion.span>
 
-              {/* Title Names */}
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -272,7 +239,6 @@ export default function App() {
                 Tasneem & Yehia
               </motion.h1>
 
-              {/* Subtitle */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -286,10 +252,8 @@ export default function App() {
                   September 27, 2026
                 </p>
               </motion.div>
-
             </div>
 
-            {/* Scroll indicator */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: [0, 1, 0] }}
