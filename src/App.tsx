@@ -43,12 +43,12 @@ export default function App() {
     setPetals(newPetals);
   }, []);
 
-  // Ensure Envelope.mp4 forces play cleanly on mount without interruptions
+  // Force play the envelope video safely on mount
   useEffect(() => {
     if (envelopeVideoRef.current) {
       envelopeVideoRef.current.currentTime = 0;
       envelopeVideoRef.current.play().catch((err) => {
-        console.log("Autoplay blocked, user interaction required:", err);
+        console.log("Playback prevented:", err);
       });
     }
   }, []);
@@ -76,13 +76,17 @@ export default function App() {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black overflow-hidden"
           >
-            {/* Pure native video tag without conflicting handlers */}
+            {/* 
+              Muted is set to true initially to satisfy browser autoplay policies, 
+              ensuring the video starts playing instantly instead of throwing a NotAllowedError.
+            */}
             <video
               ref={envelopeVideoRef}
               src={`${import.meta.env.BASE_URL}Envelope.mp4`}
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
               playsInline
+              muted
               preload="auto"
               onEnded={() => setShowWebsite(true)}
               onError={(e) => {
@@ -94,12 +98,7 @@ export default function App() {
             {/* Click-to-Enter / Skip overlay */}
             <div 
               className="relative z-10 max-w-lg w-full px-6 text-center flex flex-col items-center justify-between h-full py-16 cursor-pointer"
-              onClick={() => {
-                if (envelopeVideoRef.current) {
-                  envelopeVideoRef.current.play();
-                }
-                setShowWebsite(true);
-              }}
+              onClick={() => setShowWebsite(true)}
             >
               <div className="flex flex-col items-center pt-8">
                 <div className="w-14 h-14 border border-white/40 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm">
