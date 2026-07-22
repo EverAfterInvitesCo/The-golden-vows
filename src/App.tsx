@@ -23,7 +23,8 @@ import OrganizerPortal from "./components/OrganizerPortal";
 export default function App() {
   const [showWebsite, setShowWebsite] = useState(false);
   const [heroVideoFailed, setHeroVideoFailed] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const envelopeVideoRef = useRef<HTMLVideoElement>(null);
+  const mainVideoRef = useRef<HTMLVideoElement>(null);
 
   // Floating Petals State
   const [petals, setPetals] = useState<{ id: number; left: number; delay: number; duration: number; size: number }[]>([]);
@@ -59,17 +60,17 @@ export default function App() {
           >
             {/* Background Fullscreen Envelope Video with Sound, Unmuted, No Loop, Opens Website when finished */}
             <video
-              ref={videoRef}
+              ref={envelopeVideoRef}
               src={`${import.meta.env.BASE_URL}Envelope.mp4`}
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
               playsInline
               muted={false}
               onLoadedMetadata={() => {
-                if (videoRef.current) {
-                  videoRef.current.muted = false;
-                  videoRef.current.volume = 1.0;
-                  videoRef.current.play().catch((err) => {
+                if (envelopeVideoRef.current) {
+                  envelopeVideoRef.current.muted = false;
+                  envelopeVideoRef.current.volume = 1.0;
+                  envelopeVideoRef.current.play().catch((err) => {
                     console.log("Autoplay with sound was prevented by browser policy:", err);
                   });
                 }
@@ -88,9 +89,9 @@ export default function App() {
             <div 
               className="relative z-10 max-w-lg w-full px-6 text-center flex flex-col items-center justify-between h-full py-16 cursor-pointer"
               onClick={() => {
-                if (videoRef.current) {
-                  videoRef.current.muted = false;
-                  videoRef.current.play();
+                if (envelopeVideoRef.current) {
+                  envelopeVideoRef.current.muted = false;
+                  envelopeVideoRef.current.play();
                 }
                 setShowWebsite(true);
               }}
@@ -180,12 +181,19 @@ export default function App() {
             {/* Background Cinematic Video Loop */}
             {!heroVideoFailed ? (
               <video
+                ref={mainVideoRef}
                 src={`${import.meta.env.BASE_URL}Window.mp4`}
                 className="absolute inset-0 w-full h-full object-cover"
                 autoPlay
                 muted
                 loop
                 playsInline
+                onLoadedMetadata={() => {
+                  if (mainVideoRef.current && envelopeVideoRef.current) {
+                    // Try to sync time roughly so it feels consecutive if they match up
+                    mainVideoRef.current.currentTime = 0;
+                  }
+                }}
                 onError={handleHeroVideoError}
               />
             ) : (
