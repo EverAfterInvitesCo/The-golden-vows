@@ -15,7 +15,7 @@ const supabase = supabaseUrl && supabaseUrl.startsWith("http") && supabaseAnonKe
   : null;
 
 const WEDDING_SLUG = (import.meta as any).env?.VITE_WEDDING_SLUG || "tasneem-yehia";
-const STORAGE_BUCKET = "wedding-gallery";
+const STORAGE_BUCKET = "photos";
 
 interface PhotoItem {
   id: string;
