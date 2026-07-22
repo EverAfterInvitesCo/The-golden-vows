@@ -77,20 +77,34 @@ export default function PhotoUploadSection() {
   }, []);
 
   const fetchPhotos = async () => {
-    await fetchPhotosFromBackend();
-  };
+    if (!supabase) {
+      console.warn("Supabase client is not initialized.");
+      return;
+    }
 
-  const fetchPhotosFromBackend = async () => {
     try {
-      const response = await fetch("/api/photos");
-      if (response.ok) {
-        const data = await response.json();
-        setPhotos(data.filter((p: Photo) => p.approved !== false));
-      } else {
-        console.error("Failed to fetch photos from API:", response.statusText);
+      const table = await getActivePhotoTable();
+      let query = supabase.from(table).select("*").order("created_at", { ascending: false });
+      
+      // Filter by wedding slug if your table supports it
+      const { data, error } = await query;
+
+      if (error) {
+        console.error("Failed to fetch photos from Supabase:", error.message);
+        return;
+      }
+
+      if (data) {
+        // Filter out unapproved photos and match the current wedding slug if present
+        const filtered = data.filter((p: Photo) => {
+          const matchesSlug = !p.wedding_slug || p.wedding_slug === WEDDING_SLUG;
+          const isApproved = p.approved !== false;
+          return matchesSlug && isApproved;
+        });
+        setPhotos(filtered);
       }
     } catch (err) {
-      console.error("Failed to fetch photos from backend server:", err);
+      console.error("Failed to fetch photos:", err);
     }
   };
 
@@ -190,82 +204,48 @@ export default function PhotoUploadSection() {
     setUploadStatus("uploading");
     setProgress(85);
 
-    if (supabase) {
-      try {
-        const fileExt = file.name.split(".").pop();
-        const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-
-        // 1. Upload to Supabase Storage Bucket 'photos'
-        const { error: storageError } = await supabase.storage
-          .from("photos")
-          .upload(fileName, file);
-
-        if (storageError) {
-          throw new Error(`Storage error: ${storageError.message}`);
-        }
-
-        // 2. Get Public URL
-        const { data: publicURLData } = supabase.storage
-          .from("photos")
-          .getPublicUrl(fileName);
-
-        const publicUrl = publicURLData.publicUrl;
-
-        // 3. Insert record into active database table
-        const table = await getActivePhotoTable();
-        const { error: dbError } = await supabase
-          .from(table)
-          .insert([
-            {
-              id: Date.now().toString(),
-              url: publicUrl,
-              approved: true,
-              wedding_slug: WEDDING_SLUG,
-              created_at: new Date().toISOString(),
-            }
-          ]);
-
-        if (dbError) {
-          throw new Error(`Database error: ${dbError.message}`);
-        }
-
-        setUploadStatus("success");
-        setProgress(100);
-        setTimeout(() => {
-          setUploadStatus("idle");
-          setPreviewUrl(null);
-          setProgress(0);
-          fetchPhotos();
-        }, 2000);
-        return; // Success! Exit early.
-
-      } catch (err: any) {
-        console.warn("Direct Supabase upload failed, falling back to local Express server API upload:", err.message || err);
-      }
+    if (!supabase) {
+      setErrorMessage("Supabase is not configured. Please check your environment variables.");
+      setUploadStatus("error");
+      return;
     }
 
-    // Fallback/Default: Upload to local Express backend API
     try {
-      const formData = new FormData();
-      formData.append("photo", file);
-      formData.append("wedding_slug", WEDDING_SLUG);
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
 
-      const response = await fetch("/api/photos/upload", {
-        method: "POST",
-        body: formData,
-      });
+      // 1. Upload to Supabase Storage Bucket 'photos'
+      const { error: storageError } = await supabase.storage
+        .from("photos")
+        .upload(fileName, file);
 
-      if (!response.ok) {
-        let errorMsg = "Failed to upload image to server.";
-        try {
-          const errorData = await response.json();
-          if (errorData.message || errorData.error) {
-            errorMsg = errorData.message || errorData.error;
+      if (storageError) {
+        throw new Error(`Storage error: ${storageError.message}`);
+      }
+
+      // 2. Get Public URL
+      const { data: publicURLData } = supabase.storage
+        .from("photos")
+        .getPublicUrl(fileName);
+
+      const publicUrl = publicURLData.publicUrl;
+
+      // 3. Insert record into active database table
+      const table = await getActivePhotoTable();
+      const { error: dbError } = await supabase
+        .from(table)
+        .insert([
+          {
+            id: Date.now().toString(),
+            url: publicUrl,
+            approved: true,
+            wedding_slug: WEDDING_SLUG,
+            created_at: new Date().toISOString(),
           }
-        } catch (e) {
-          // Response wasn't JSON
-        }
-        throw new Error(errorMsg);
+        ]);
+
+      if (dbError) {
+        throw new Error(`Database error: ${dbError.message}`);
       }
 
       setUploadStatus("success");
@@ -417,7 +397,7 @@ export default function PhotoUploadSection() {
                     <p className="font-sans text-xs text-red-700 max-w-xs">{errorMessage}</p>
                     <button
                       onClick={() => setUploadStatus("idle")}
-                      className="px-5 py-2 border border-[#C6A96B]/50 text-xs font-serif uppercase tracking-widest text-[#C6A96B] rounded-full"
+                      className="px-5 py-2 border border-[#C6A96B]/50 text-xs font-serif uppercase tracking-widest text-[#C6A96B] rounded-full cursor-pointer"
                     >
                       Try Again
                     </button>
