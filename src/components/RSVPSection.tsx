@@ -1,6 +1,58 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Send, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
+import { createClient } from "@supabase/supabase-js";
+
+// Initialize Supabase Client with environment variables or secure defaults
+let rawSupabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || "https://pvuszjcuvkycprbggweo.supabase.co";
+if (rawSupabaseUrl) {
+  rawSupabaseUrl = rawSupabaseUrl.replace(/\/rest\/v1\/?$/, "").replace(/\/+$/, "");
+}
+const supabaseUrl = rawSupabaseUrl;
+const supabaseAnonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || "sb_publishable_xPvR3HkIozZaxNLxPCIRfw_dvljpvdV";
+const supabase = supabaseUrl && supabaseUrl.startsWith("http") && supabaseAnonKey
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
+
+const WEDDING_SLUG = (import.meta as any).env?.VITE_WEDDING_SLUG || "tasneem-yehia";
+
+let cachedRsvpTable: "rsvps" | "guest_rsvps" | null = null;
+
+async function getActiveRsvpTable(): Promise<"rsvps" | "guest_rsvps"> {
+  if (cachedRsvpTable) return cachedRsvpTable;
+  if (!supabase) return "rsvps";
+
+  try {
+    const { error } = await supabase
+      .from("rsvps")
+      .select("id")
+      .limit(1);
+    
+    if (!error) {
+      cachedRsvpTable = "rsvps";
+      return "rsvps";
+    }
+  } catch (err) {
+    // Ignore
+  }
+
+  try {
+    const { error } = await supabase
+      .from("guest_rsvps")
+      .select("id")
+      .limit(1);
+    
+    if (!error) {
+      cachedRsvpTable = "guest_rsvps";
+      return "guest_rsvps";
+    }
+  } catch (err) {
+    // Ignore
+  }
+
+  cachedRsvpTable = "rsvps";
+  return "rsvps";
+}
 
 export default function RSVPSection() {
   const [formData, setFormData] = useState({
@@ -36,26 +88,39 @@ export default function RSVPSection() {
 
     setStatus("submitting");
 
+    if (!supabase) {
+      setErrorMessage("Supabase is not configured. Please check your environment variables.");
+      setStatus("error");
+      return;
+    }
+
     try {
-      const response = await fetch("/api/rsvp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const table = await getActiveRsvpTable();
+      
+      const payload = {
+        id: Date.now().toString(),
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim(),
+        number_of_guests: parseInt(formData.number_of_guests, 10) || 1,
+        attendance: formData.attendance,
+        dietary_requirements: formData.dietary_requirements.trim(),
+        wedding_slug: WEDDING_SLUG,
+        created_at: new Date().toISOString(),
+      };
 
-      const data = await response.json();
+      const { error } = await supabase
+        .from(table)
+        .insert([payload]);
 
-      if (response.ok) {
-        setStatus("success");
-      } else {
-        setErrorMessage(data.error || "Something went wrong. Please try again.");
-        setStatus("error");
+      if (error) {
+        throw new Error(error.message);
       }
-    } catch (error) {
+
+      setStatus("success");
+    } catch (error: any) {
       console.error('RSVP error details:', error);
-      setErrorMessage("Network error. Please try again later.");
+      setErrorMessage(error.message || "Network error. Please try again later.");
       setStatus("error");
     }
   };
@@ -140,7 +205,7 @@ export default function RSVPSection() {
                       dietary_requirements: "",
                     });
                   }}
-                  className="font-serif text-[10px] uppercase tracking-wider text-[#C6A96B] border-b border-[#C6A96B]/30 pb-0.5 hover:text-[#2D2D2D] transition-colors"
+                  className="font-serif text-[10px] uppercase tracking-wider text-[#C6A96B] border-b border-[#C6A96B]/30 pb-0.5 hover:text-[#2D2D2D] transition-colors cursor-pointer"
                 >
                   Edit or Submit another RSVP
                 </button>
@@ -282,7 +347,7 @@ export default function RSVPSection() {
                   <button
                     type="submit"
                     disabled={status === "submitting"}
-                    className="inline-flex items-center justify-center gap-2 px-10 py-3.5 bg-[#C6A96B] hover:bg-[#B5985A] text-white transition-all duration-300 rounded-full font-serif text-xs uppercase tracking-[0.2em] shadow-lg disabled:opacity-50"
+                    className="inline-flex items-center justify-center gap-2 px-10 py-3.5 bg-[#C6A96B] hover:bg-[#B5985A] text-white transition-all duration-300 rounded-full font-serif text-xs uppercase tracking-[0.2em] shadow-lg disabled:opacity-50 cursor-pointer"
                   >
                     {status === "submitting" ? (
                       "Saving Response..."
