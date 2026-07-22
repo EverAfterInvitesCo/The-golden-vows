@@ -2,7 +2,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { RSVPResponse } from "../types";
 import { supabase, WEDDING_SLUG } from "../supabaseClient";
-import { Users, Heart, Sparkles, ShieldCheck, Mail, UserCheck, UserX } from "lucide-react";
+import { Users, Heart, Sparkles, ShieldCheck, UserCheck, UserX } from "lucide-react";
 
 interface OrganizerPortalProps {
   tick?: number;
@@ -145,11 +145,11 @@ export default function OrganizerPortal({ tick = 0 }: OrganizerPortalProps) {
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-[#F3EBDD]">
-                              {submss.map((sub, idx) => {
+                              {submss.map((sub: any, idx: number) => {
                                 const isAttending = String(sub.attending).toLowerCase() === 'true' || String(sub.attending).toLowerCase() === 'yes';
                                 return (
                                   <tr key={idx} className="hover:bg-[#FAF6EE]/50 transition-colors">
-                                    <td className="px-6 py-4 font-medium text-[#2A2825]">{sub.name || sub.guestName || "Anonymous"}</td>
+                                    <td className="px-6 py-4 font-medium text-[#2A2825]">{sub.fullName || sub.name || "Anonymous"}</td>
                                     <td className="px-6 py-4">
                                       {isAttending ? (
                                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -162,7 +162,7 @@ export default function OrganizerPortal({ tick = 0 }: OrganizerPortalProps) {
                                       )}
                                     </td>
                                     <td className="px-6 py-4 text-gray-600">{sub.guestsCount || 1}</td>
-                                    <td className="px-6 py-4 text-gray-500 italic max-w-xs truncate">{sub.notes || sub.message || "—"}</td>
+                                    <td className="px-6 py-4 text-gray-500 italic max-w-xs truncate">{sub.dietaryNotes || sub.wellWishes || "—"}</td>
                                   </tr>
                                 );
                               })}
