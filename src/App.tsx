@@ -76,10 +76,6 @@ export default function App() {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black overflow-hidden"
           >
-            {/* 
-              Muted is set to true initially to satisfy browser autoplay policies, 
-              ensuring the video starts playing instantly instead of throwing a NotAllowedError.
-            */}
             <video
               ref={envelopeVideoRef}
               src={`${import.meta.env.BASE_URL}Envelope.mp4`}
@@ -94,30 +90,6 @@ export default function App() {
                 setShowWebsite(true);
               }}
             />
-
-            {/* Click-to-Enter / Skip overlay */}
-            <div 
-              className="relative z-10 max-w-lg w-full px-6 text-center flex flex-col items-center justify-between h-full py-16 cursor-pointer"
-              onClick={() => setShowWebsite(true)}
-            >
-              <div className="flex flex-col items-center pt-8">
-                <div className="w-14 h-14 border border-white/40 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm">
-                  <span className="font-serif text-sm text-white tracking-widest">TY</span>
-                </div>
-                <span className="font-serif text-[10px] tracking-[0.35em] text-[#C6A96B] uppercase block mb-1 drop-shadow">
-                  You Are Invited
-                </span>
-                <h2 className="font-script text-4xl md:text-6xl text-white drop-shadow-md italic">
-                  Tasneem & Yehia
-                </h2>
-              </div>
-
-              <div className="pb-8">
-                <span className="font-serif text-xs tracking-[0.3em] text-[#C6A96B] uppercase animate-pulse border border-[#C6A96B]/40 py-2.5 px-6 rounded-full bg-black/50 backdrop-blur-sm">
-                  Tap Anywhere to Skip Intro 🤍
-                </span>
-              </div>
-            </div>
           </motion.div>
         )}
       </AnimatePresence>
