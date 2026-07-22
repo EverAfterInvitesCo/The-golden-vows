@@ -28,6 +28,7 @@ export default function App() {
   
   const envelopeVideoRef = useRef<HTMLVideoElement>(null);
   const mainVideoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   // Floating Petals State
   const [petals, setPetals] = useState<{ id: number; left: number; delay: number; duration: number; size: number }[]>([]);
@@ -53,13 +54,27 @@ export default function App() {
     }
   }, []);
 
-  // Global iOS touch listener fallback: forces main video to play on the very first user touch anywhere
+  // Handle transition when intro finishes: plays audio automatically
+  const handleIntroEnded = () => {
+    setShowWebsite(true);
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch((err) => {
+        console.log("Audio autoplay restricted by browser:", err);
+      });
+    }
+  };
+
+  // Global iOS touch listener fallback: forces main video & audio to play on the very first user touch anywhere
   useEffect(() => {
     if (!showWebsite) return;
 
     const handleGlobalTouch = () => {
       if (mainVideoRef.current && mainVideoRef.current.paused) {
         mainVideoRef.current.play().catch(() => {});
+      }
+      if (audioRef.current && audioRef.current.paused && !isMuted) {
+        audioRef.current.play().catch(() => {});
       }
     };
 
@@ -70,7 +85,7 @@ export default function App() {
       window.removeEventListener("touchstart", handleGlobalTouch);
       window.removeEventListener("click", handleGlobalTouch);
     };
-  }, [showWebsite]);
+  }, [showWebsite, isMuted]);
 
   const handleHeroVideoError = () => {
     setHeroVideoFailed(true);
@@ -79,13 +94,19 @@ export default function App() {
   const toggleSound = () => {
     if (mainVideoRef.current) {
       mainVideoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
     }
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
+    }
+    setIsMuted(!isMuted);
   };
 
   return (
     <div className="min-h-screen bg-[#FAF8F4] text-[#2D2D2D] relative overflow-x-hidden selection:bg-[#C6A96B]/25 selection:text-[#2D2D2D]">
       
+      {/* Background Audio Element (Ensure piano.mp3 is placed inside your public folder) */}
+      <audio ref={audioRef} src={`${import.meta.env.BASE_URL}piano.mp3`} loop preload="auto" />
+
       {/* 1. INTRO EXPERIENCE / FULLSCREEN ENVELOPE VIDEO */}
       <AnimatePresence>
         {!showWebsite && (
@@ -103,10 +124,10 @@ export default function App() {
               playsInline
               muted
               preload="auto"
-              onEnded={() => setShowWebsite(true)}
+              onEnded={handleIntroEnded}
               onError={(e) => {
                 console.log("Envelope video error:", e);
-                setShowWebsite(true);
+                handleIntroEnded();
               }}
             />
           </motion.div>
