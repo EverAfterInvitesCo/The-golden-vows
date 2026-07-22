@@ -44,7 +44,7 @@ export default function App() {
     setPetals(newPetals);
   }, []);
 
-  // Force play the envelope video safely on mount (with sound enabled)
+  // Force play the envelope video safely on mount
   useEffect(() => {
     if (envelopeVideoRef.current) {
       envelopeVideoRef.current.currentTime = 0;
@@ -109,7 +109,7 @@ export default function App() {
         preload="auto" 
       />
 
-      {/* 1. INTRO EXPERIENCE / FULLSCREEN ENVELOPE VIDEO (Sound Enabled) */}
+      {/* 1. INTRO EXPERIENCE / FULLSCREEN ENVELOPE VIDEO */}
       <AnimatePresence>
         {!showWebsite && (
           <motion.div
@@ -124,6 +124,7 @@ export default function App() {
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
               playsInline
+              muted
               preload="auto"
               onEnded={handleIntroEnded}
               onError={(e) => {
