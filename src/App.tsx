@@ -92,9 +92,6 @@ export default function App() {
   };
 
   const toggleSound = () => {
-    if (mainVideoRef.current) {
-      mainVideoRef.current.muted = !isMuted;
-    }
     if (audioRef.current) {
       audioRef.current.muted = !isMuted;
     }
@@ -173,7 +170,7 @@ export default function App() {
           <button
             onClick={toggleSound}
             className="fixed top-6 right-6 z-40 bg-black/55 hover:bg-black/75 text-white backdrop-blur-md border border-white/20 p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center group"
-            title={isMuted ? "Unmute Music/Audio" : "Mute Music/Audio"}
+            title={isMuted ? "Unmute Music" : "Mute Music"}
           >
             {isMuted ? (
               <VolumeX className="w-5 h-5 text-white/70 group-hover:text-white" />
@@ -190,21 +187,14 @@ export default function App() {
                 src={`${import.meta.env.BASE_URL}Window.mp4`}
                 className="absolute inset-0 w-full h-full object-cover"
                 autoPlay
-                muted={isMuted}
+                muted
                 loop
                 playsInline
                 preload="auto"
                 onLoadedData={() => {
                   if (mainVideoRef.current) {
                     mainVideoRef.current.currentTime = 0;
-                    mainVideoRef.current.muted = isMuted;
-                    mainVideoRef.current.play().catch(() => {
-                      setIsMuted(true);
-                      if (mainVideoRef.current) {
-                        mainVideoRef.current.muted = true;
-                        mainVideoRef.current.play().catch(() => {});
-                      }
-                    });
+                    mainVideoRef.current.play().catch(() => {});
                   }
                 }}
                 onError={handleHeroVideoError}
@@ -214,7 +204,7 @@ export default function App() {
                 src="https://assets.mixkit.co/videos/preview/mixkit-wedding-rings-and-flowers-40243-large.mp4"
                 className="absolute inset-0 w-full h-full object-cover"
                 autoPlay
-                muted={isMuted}
+                muted
                 loop
                 playsInline
               />
