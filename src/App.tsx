@@ -104,7 +104,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#FAF8F4] text-[#2D2D2D] relative overflow-x-hidden selection:bg-[#C6A96B]/25 selection:text-[#2D2D2D]">
       
-      {/* Background Audio Element (Ensure piano.mp3 is placed inside your public folder) */}
+      {/* Background Audio Element */}
       <audio ref={audioRef} src={`${import.meta.env.BASE_URL}piano.mp3`} loop preload="auto" />
 
       {/* 1. INTRO EXPERIENCE / FULLSCREEN ENVELOPE VIDEO */}
@@ -347,7 +347,7 @@ export default function App() {
                       <div className="absolute -inset-4 border border-[#C6A96B]/20 rounded-2xl rotate-2 group-hover:rotate-0 transition-transform duration-700 pointer-events-none" />
                       <div className="absolute -inset-4 border border-[#C6A96B]/10 rounded-2xl -rotate-2 group-hover:rotate-0 transition-transform duration-700 pointer-events-none" />
                       
-                      <div className="relative overflow-hidden rounded-2xl bg-white/40 p-4 border border-[#C6A96B]/15 shadow-xl">
+                      <div className="relative overflow-hidden rounded-2xl p-0">
                         <img
                           src={`${import.meta.env.BASE_URL}kids.png`}
                           onError={(e) => {
