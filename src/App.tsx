@@ -44,7 +44,7 @@ export default function App() {
     setPetals(newPetals);
   }, []);
 
-  // Force play the envelope video safely on mount
+  // Force play the envelope video safely on mount (with sound enabled)
   useEffect(() => {
     if (envelopeVideoRef.current) {
       envelopeVideoRef.current.currentTime = 0;
@@ -101,10 +101,15 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#FAF8F4] text-[#2D2D2D] relative overflow-x-hidden selection:bg-[#C6A96B]/25 selection:text-[#2D2D2D]">
       
-      {/* Background Audio Element */}
-      <audio ref={audioRef} src={`${import.meta.env.BASE_URL}piano.mp3`} loop preload="auto" />
+      {/* Background Audio Element with Loop */}
+      <audio 
+        ref={audioRef} 
+        src={`${import.meta.env.BASE_URL}piano.mp3`} 
+        loop 
+        preload="auto" 
+      />
 
-      {/* 1. INTRO EXPERIENCE / FULLSCREEN ENVELOPE VIDEO */}
+      {/* 1. INTRO EXPERIENCE / FULLSCREEN ENVELOPE VIDEO (Sound Enabled) */}
       <AnimatePresence>
         {!showWebsite && (
           <motion.div
@@ -119,7 +124,6 @@ export default function App() {
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
               playsInline
-              muted
               preload="auto"
               onEnded={handleIntroEnded}
               onError={(e) => {
