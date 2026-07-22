@@ -53,6 +53,25 @@ export default function App() {
     }
   }, []);
 
+  // Global iOS touch listener fallback: forces main video to play on the very first user touch anywhere
+  useEffect(() => {
+    if (!showWebsite) return;
+
+    const handleGlobalTouch = () => {
+      if (mainVideoRef.current && mainVideoRef.current.paused) {
+        mainVideoRef.current.play().catch(() => {});
+      }
+    };
+
+    window.addEventListener("touchstart", handleGlobalTouch, { once: true });
+    window.addEventListener("click", handleGlobalTouch, { once: true });
+
+    return () => {
+      window.removeEventListener("touchstart", handleGlobalTouch);
+      window.removeEventListener("click", handleGlobalTouch);
+    };
+  }, [showWebsite]);
+
   const handleHeroVideoError = () => {
     setHeroVideoFailed(true);
   };
@@ -158,16 +177,13 @@ export default function App() {
                   if (mainVideoRef.current) {
                     mainVideoRef.current.currentTime = 0;
                     mainVideoRef.current.muted = isMuted;
-                    const playPromise = mainVideoRef.current.play();
-                    if (playPromise !== undefined) {
-                      playPromise.catch(() => {
-                        setIsMuted(true);
-                        if (mainVideoRef.current) {
-                          mainVideoRef.current.muted = true;
-                          mainVideoRef.current.play().catch(() => {});
-                        }
-                      });
-                    }
+                    mainVideoRef.current.play().catch(() => {
+                      setIsMuted(true);
+                      if (mainVideoRef.current) {
+                        mainVideoRef.current.muted = true;
+                        mainVideoRef.current.play().catch(() => {});
+                      }
+                    });
                   }
                 }}
                 onError={handleHeroVideoError}
