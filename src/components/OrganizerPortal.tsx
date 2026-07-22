@@ -9,7 +9,7 @@ interface OrganizerPortalProps {
   onReset?: () => void;
 }
 
-export default function OrganizerPortal({ tick = 0, onReset }: OrganizerPortalProps) {
+export default function OrganizerPortal({ tick = 0 }: OrganizerPortalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [submss, setSubmss] = useState<RSVPResponse[]>([]);
   const [email, setEmail] = useState("");
@@ -40,12 +40,17 @@ export default function OrganizerPortal({ tick = 0, onReset }: OrganizerPortalPr
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setAuthError(false);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
     if (error) {
       setAuthError(true);
     } else {
       setIsUnlocked(true);
-      setAuthError(false);
       loadSubmissions();
     }
   };
@@ -71,10 +76,24 @@ export default function OrganizerPortal({ tick = 0, onReset }: OrganizerPortalPr
               <div className="pt-8 mt-6 border-t border-[#F3EBDD]">
                 {!isUnlocked ? (
                   <form onSubmit={handleLogin} className="max-w-xs mx-auto space-y-4">
-                    <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 text-sm rounded-lg border bg-white" />
-                    <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-2 text-sm rounded-lg border bg-white" />
+                    <input 
+                      type="email" 
+                      placeholder="Email" 
+                      value={email} 
+                      onChange={(e) => setEmail(e.target.value)} 
+                      className="w-full px-4 py-2 text-sm rounded-lg border bg-white" 
+                      required 
+                    />
+                    <input 
+                      type="password" 
+                      placeholder="Password" 
+                      value={password} 
+                      onChange={(e) => setPassword(e.target.value)} 
+                      className="w-full px-4 py-2 text-sm rounded-lg border bg-white" 
+                      required 
+                    />
                     <button type="submit" className="w-full py-2 bg-[#C5A059] text-white text-sm font-semibold rounded-lg hover:bg-[#b08d4a] transition-colors">Login</button>
-                    {authError && <p className="text-xs text-red-600 text-center">* Invalid credentials.</p>}
+                    {authError && <p className="text-xs text-red-600 text-center">* Invalid email or password. Please try again.</p>}
                   </form>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
