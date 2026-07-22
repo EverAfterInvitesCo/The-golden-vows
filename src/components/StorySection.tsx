@@ -13,7 +13,7 @@ export default function StorySection() {
     "Our story began on a warm autumn evening, a simple meeting of eyes that would forever alter the course of our lives. What started as a casual conversation about literature and travel slowly blossomed into a profound connection that words could scarcely define.\n\nThrough shared laughter, silent support, and endless adventures across lands and dreams, we realized we had found our safe harbor in each other. Now, as we stand on the threshold of our forever, we are overjoyed to embark on this beautiful sacred bond surrounded by those we love most."
   );
   const [imageUrl, setImageUrl] = useState(
-    "/assets/download.jpg"
+    `${import.meta.env.BASE_URL}download.jpg`
   );
 
   // Load from localStorage if exists
@@ -46,7 +46,7 @@ export default function StorySection() {
       setQuote("In all the world, there is no heart for me like yours. In all the world, there is no love for you like mine.");
       setAuthor("Maya Angelou");
       setStory("Our story began on a warm autumn evening, a simple meeting of eyes that would forever alter the course of our lives. What started as a casual conversation about literature and travel slowly blossomed into a profound connection that words could scarcely define.\n\nThrough shared laughter, silent support, and endless adventures across lands and dreams, we realized we had found our safe harbor in each other. Now, as we stand on the threshold of our forever, we are overjoyed to embark on this beautiful sacred bond surrounded by those we love most.");
-      setImageUrl("/assets/download.jpg");
+      setImageUrl(`${import.meta.env.BASE_URL}download.jpg`);
       
       localStorage.removeItem("wedding_story_title");
       localStorage.removeItem("wedding_story_quote");
@@ -113,6 +113,9 @@ export default function StorySection() {
             <div className="relative rounded-2xl overflow-hidden shadow-xl border border-[#C6A96B]/15 bg-white aspect-[3/4] z-10 group">
               <img
                 src={imageUrl}
+                onError={(e) => {
+                  e.currentTarget.src = "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&q=80&w=1200";
+                }}
                 alt="Our Story"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 referrerPolicy="no-referrer"
