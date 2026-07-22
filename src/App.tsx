@@ -6,7 +6,9 @@ import {
   Facebook, 
   Music, 
   Heart,
-  Sparkles
+  Sparkles,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 
 // Components
@@ -22,6 +24,8 @@ import OrganizerPortal from "./components/OrganizerPortal";
 export default function App() {
   const [showWebsite, setShowWebsite] = useState(false);
   const [heroVideoFailed, setHeroVideoFailed] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  
   const envelopeVideoRef = useRef<HTMLVideoElement>(null);
   const mainVideoRef = useRef<HTMLVideoElement>(null);
 
@@ -45,6 +49,13 @@ export default function App() {
     setHeroVideoFailed(true);
   };
 
+  const toggleSound = () => {
+    if (mainVideoRef.current) {
+      mainVideoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FAF8F4] text-[#2D2D2D] relative overflow-x-hidden selection:bg-[#C6A96B]/25 selection:text-[#2D2D2D]">
       
@@ -57,7 +68,7 @@ export default function App() {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black overflow-hidden"
           >
-            {/* Background Fullscreen Envelope Video: Stops right before the archway/swans appear (~4.2 seconds) */}
+            {/* Background Fullscreen Trimmed Envelope Video with Sound */}
             <video
               ref={envelopeVideoRef}
               src={`${import.meta.env.BASE_URL}Envelope.mp4`}
@@ -72,13 +83,6 @@ export default function App() {
                   envelopeVideoRef.current.play().catch((err) => {
                     console.log("Autoplay with sound was prevented by browser policy:", err);
                   });
-                }
-              }}
-              onTimeUpdate={() => {
-                // Cut off right when the archway/swans part begins (approx 4.15s) so the swans video takes over cleanly in the hero
-                if (envelopeVideoRef.current && envelopeVideoRef.current.currentTime >= 4.15) {
-                  envelopeVideoRef.current.pause();
-                  setShowWebsite(true);
                 }
               }}
               onEnded={() => setShowWebsite(true)}
@@ -182,21 +186,40 @@ export default function App() {
             ))}
           </div>
 
-          {/* ================= HERO SECTION (SWANS ARCHWAY VIDEO) ================= */}
+          {/* Sound Toggle Floating Button */}
+          <button
+            onClick={toggleSound}
+            className="fixed top-6 right-6 z-40 bg-black/50 hover:bg-black/70 text-white backdrop-blur-md border border-white/20 p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center group"
+            title={isMuted ? "Unmute Music/Audio" : "Mute Music/Audio"}
+          >
+            {isMuted ? (
+              <VolumeX className="w-5 h-5 text-white/70 group-hover:text-white" />
+            ) : (
+              <Volume2 className="w-5 h-5 text-[#C6A96B] animate-pulse" />
+            )}
+          </button>
+
+          {/* ================= HERO SECTION (SWANS HERO VIDEO WITH SOUND) ================= */}
           <header className="relative w-full h-screen flex flex-col items-center justify-center text-center overflow-hidden z-10">
-            {/* Background Cinematic Video Loop (Window.mp4 starts precisely with the archway & swimming swans) */}
+            {/* Background Cinematic Video Loop with Sound */}
             {!heroVideoFailed ? (
               <video
                 ref={mainVideoRef}
                 src={`${import.meta.env.BASE_URL}Window.mp4`}
                 className="absolute inset-0 w-full h-full object-cover"
                 autoPlay
-                muted
+                muted={isMuted}
                 loop
                 playsInline
                 onLoadedMetadata={() => {
                   if (mainVideoRef.current) {
                     mainVideoRef.current.currentTime = 0;
+                    mainVideoRef.current.muted = isMuted;
+                    mainVideoRef.current.play().catch(() => {
+                      // fallback if browser blocks auto audio on hero transition
+                      setIsMuted(true);
+                      mainVideoRef.current!.muted = true;
+                    });
                   }
                 }}
                 onError={handleHeroVideoError}
@@ -207,7 +230,7 @@ export default function App() {
                 src="https://assets.mixkit.co/videos/preview/mixkit-wedding-rings-and-flowers-40243-large.mp4"
                 className="absolute inset-0 w-full h-full object-cover"
                 autoPlay
-                muted
+                muted={isMuted}
                 loop
                 playsInline
               />
