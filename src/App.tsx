@@ -68,17 +68,16 @@ export default function App() {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black overflow-hidden"
           >
-            {/* Background Fullscreen Envelope Video playing fully until it ends */}
+            {/* Background Fullscreen Envelope Video */}
             <video
               ref={envelopeVideoRef}
               src={`${import.meta.env.BASE_URL}Envelope.mp4`}
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
               playsInline
-              preload="auto"
               muted={false}
-              onCanPlayThrough={() => {
-                if (envelopeVideoRef.current && envelopeVideoRef.current.paused) {
+              onLoadedData={() => {
+                if (envelopeVideoRef.current) {
                   envelopeVideoRef.current.muted = false;
                   envelopeVideoRef.current.volume = 1.0;
                   envelopeVideoRef.current.play().catch((err) => {
@@ -94,9 +93,9 @@ export default function App() {
             />
 
             {/* Subtle dark gradient overlay to make text pop */}
-            <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+            <div className="absolute inset-0 bg-black/10 pointer-events-none" />
 
-            {/* Foreground Content Container with Click-to-Enter Fallback if Autoplay blocked */}
+            {/* Foreground Content Container with Click-to-Enter / Skip */}
             <div 
               className="relative z-10 max-w-lg w-full px-6 text-center flex flex-col items-center justify-between h-full py-16 cursor-pointer"
               onClick={() => {
@@ -140,7 +139,7 @@ export default function App() {
                 </motion.h2>
               </div>
 
-              {/* Click / Tap to Enter Hint if browser restricts video */}
+              {/* Click / Tap to Skip Hint */}
               <div className="pb-8">
                 <span className="font-serif text-xs tracking-[0.3em] text-[#C6A96B] uppercase animate-pulse border border-[#C6A96B]/40 py-2.5 px-6 rounded-full bg-black/50 backdrop-blur-sm">
                   Tap Anywhere to Skip Intro 🤍
@@ -200,7 +199,7 @@ export default function App() {
             )}
           </button>
 
-          {/* ================= HERO SECTION (SWANS HERO VIDEO WITH SOUND) ================= */}
+          {/* ================= HERO SECTION (WINDOW.MP4 HERO VIDEO WITH SOUND) ================= */}
           <header className="relative w-full h-screen flex flex-col items-center justify-center text-center overflow-hidden z-10">
             {/* Background Cinematic Video Loop with Sound */}
             {!heroVideoFailed ? (
@@ -212,8 +211,7 @@ export default function App() {
                 muted={isMuted}
                 loop
                 playsInline
-                preload="auto"
-                onLoadedMetadata={() => {
+                onLoadedData={() => {
                   if (mainVideoRef.current) {
                     mainVideoRef.current.currentTime = 0;
                     mainVideoRef.current.muted = isMuted;
