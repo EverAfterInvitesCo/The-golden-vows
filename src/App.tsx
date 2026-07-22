@@ -5,7 +5,6 @@ import {
   Instagram, 
   Facebook, 
   Music, 
-  MapPin, 
   Heart,
   Sparkles
 } from "lucide-react";
@@ -58,7 +57,7 @@ export default function App() {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black overflow-hidden"
           >
-            {/* Background Fullscreen Envelope Video with Sound, Unmuted, No Loop, Opens Website when finished */}
+            {/* Background Fullscreen Envelope Video: Stops right before the archway/swans appear (~4.2 seconds) */}
             <video
               ref={envelopeVideoRef}
               src={`${import.meta.env.BASE_URL}Envelope.mp4`}
@@ -73,6 +72,13 @@ export default function App() {
                   envelopeVideoRef.current.play().catch((err) => {
                     console.log("Autoplay with sound was prevented by browser policy:", err);
                   });
+                }
+              }}
+              onTimeUpdate={() => {
+                // Cut off right when the archway/swans part begins (approx 4.15s) so the swans video takes over cleanly in the hero
+                if (envelopeVideoRef.current && envelopeVideoRef.current.currentTime >= 4.15) {
+                  envelopeVideoRef.current.pause();
+                  setShowWebsite(true);
                 }
               }}
               onEnded={() => setShowWebsite(true)}
@@ -176,9 +182,9 @@ export default function App() {
             ))}
           </div>
 
-          {/* ================= HERO SECTION ================= */}
+          {/* ================= HERO SECTION (SWANS ARCHWAY VIDEO) ================= */}
           <header className="relative w-full h-screen flex flex-col items-center justify-center text-center overflow-hidden z-10">
-            {/* Background Cinematic Video Loop */}
+            {/* Background Cinematic Video Loop (Window.mp4 starts precisely with the archway & swimming swans) */}
             {!heroVideoFailed ? (
               <video
                 ref={mainVideoRef}
@@ -189,8 +195,7 @@ export default function App() {
                 loop
                 playsInline
                 onLoadedMetadata={() => {
-                  if (mainVideoRef.current && envelopeVideoRef.current) {
-                    // Try to sync time roughly so it feels consecutive if they match up
+                  if (mainVideoRef.current) {
                     mainVideoRef.current.currentTime = 0;
                   }
                 }}
